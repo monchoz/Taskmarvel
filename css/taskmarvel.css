@@ -1,0 +1,22 @@
+html,
+body{
+    display: flex;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+}
+.hidden {
+    display: none !important;
+}
+.tm--audio {
+    display: flex;
+    margin-top: 20px;
+}
+.tm--audio img {
+    height: 50px;
+}
+.tm--controls {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+}

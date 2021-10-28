@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/taskmarvel.css">
+    <title>Taskmarvel</title>
+</head>
+<body>
+    <div class="tm--controls">
+        <div id="recordBtn" class="tm--button-record hidden">
+            <img src="img/play.svg" alt="Play">
+            <span>Record Audio</span>
+        </div>
+    
+        <div id="stopBtn" class="tm--button-record hidden">
+            <img src="img/stop.svg" alt="Play">
+            <span>Finish Recording</span>
+        </div>
+    
+        <div id="audioContainer" class="tm--audio hidden">
+            <audio id="audio" controls>
+                <source type="audio/webm">
+                Your browser does not support the audio element.
+            </audio>
+            <a id="downloadBtn" class="hidden">
+                <img src="img/download.svg" alt="Download Audio">
+            </a>
+        </div>
+    </div>
+
+    <script src="js/taskmarvel.js"></script>
+</body>
+</html>
