@@ -1,12 +1,16 @@
 document.addEventListener('DOMContentLoaded', function () {
     var speaker = new MediaStream;
+    var IncomingAudioMediaStream = new MediaStream();
+
     var micMediaRecorder;
     const recordedChunks = [];
+    const micRecordedChunks = [];
     const recordButton = document.getElementById("recordBtn");
     const stopButton = document.getElementById("stopBtn");
     const downloadButton = document.getElementById("downloadBtn");
     const audioPlayer = document.getElementById("audio");
     const audioContainer = document.getElementById("audioContainer");
+    const instructions = document.getElementById("instructions");
 
     recordButton.addEventListener('click', (() => window.location.reload()));
 
@@ -19,18 +23,42 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         mediaRecorder.addEventListener('stop', function () {
-            var audio = URL.createObjectURL(new Blob(recordedChunks));
-            audioContainer.classList.remove("hidden");
-            downloadButton.href = audio
-            downloadButton.download = `Taskmarvel_recording_${Date.now().toString()}.wav`;
-            audioPlayer.src = audio;
+
+            /*const audioContext = new AudioContext();
+
+            audioIn_01 = audioContext.createMediaStreamSource(speaker);
+            audioIn_02 = audioContext.createMediaStreamSource(IncomingAudioMediaStream);
+
+            const dest = audioContext.createMediaStreamDestination();
+
+            audioIn_01.connect(dest);
+            audioIn_02.connect(dest);
+
+            var FinalStream = dest.stream;
+
+            console.log(FinalStream.getAudioTracks())*/
+            
+            const videoBuff = new Blob(recordedChunks);
+            const micBuff = new Blob(micRecordedChunks);
+
+            concatenateBlobs([videoBuff, micBuff], "audio/wav", function(blob) {
+                const audio = URL.createObjectURL(blob);
+                audioContainer.classList.remove("hidden");
+                downloadButton.href = audio
+                downloadButton.download = `Taskmarvel_recording_${Date.now().toString()}.wav`;
+                audioPlayer.src = audio;
+                stopButton.classList.add("hidden");
+                recordButton.classList.remove("hidden");
+                instructions.classList.remove("hidden");
+            });
         });
 
         stopButton.addEventListener('click', function () {
             downloadButton.classList.remove("hidden");
-            mediaRecorder.stop();
             micMediaRecorder.stop();
+            mediaRecorder.stop();
             // TODO: Stop stream
+            stream.getVideoTracks().forEach(track => track.stop());
         });
 
         mediaRecorder.start();
@@ -39,12 +67,12 @@ document.addEventListener('DOMContentLoaded', function () {
     function recordMic() {
         navigator.mediaDevices.getUserMedia({ audio: true })
             .then(stream => {
-                const options = { mimeType: 'audio/webm' };
-                micMediaRecorder = new MediaRecorder(stream, options);
+                micMediaRecorder = new MediaRecorder(stream);
                 micMediaRecorder.start();
+                IncomingAudioMediaStream.addTrack(stream.getAudioTracks()[0].clone());
 
                 micMediaRecorder.addEventListener("dataavailable", e => {
-                    recordedChunks.push(e.data);
+                    micRecordedChunks.push(e.data);
                 });
             });
     }
@@ -57,6 +85,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } 
         recordMic();
         stopButton.classList.remove("hidden");
+        instructions.classList.add("hidden");
         speaker.addTrack(stream.getAudioTracks()[0].clone());
         // stopping and removing the video track to enhance the performance
         stream.getVideoTracks()[0].stop();
