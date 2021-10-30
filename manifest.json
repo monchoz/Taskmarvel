@@ -3,6 +3,7 @@
     "name": "Taskmarvel - Audio to text transcription empowered by AI",  
     "description": "Records audio from your video calls to deliver a full-text transcription.",  
     "version": "1.0", 
+    "author": "Ramon Zuniga (ramonzuniga@gmail.com)",
     "icons": {
         "128": "img/taskmarvel-logo-128.png",
         "48": "img/taskmarvel-logo-48.png",
