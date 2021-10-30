@@ -1,10 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
-    var speaker = new MediaStream;
-    var IncomingAudioMediaStream = new MediaStream();
-
-    var micMediaRecorder;
+    var speakerStream, micStream = new MediaStream;
+    var recorder, micRecorder;
+    
     const recordedChunks = [];
-    const micRecordedChunks = [];
     const recordButton = document.getElementById("recordBtn");
     const stopButton = document.getElementById("stopBtn");
     const downloadButton = document.getElementById("downloadBtn");
@@ -15,82 +13,88 @@ document.addEventListener('DOMContentLoaded', function () {
     recordButton.addEventListener('click', (() => window.location.reload()));
 
     const handleSuccess = function (stream) {
-        const options = { mimeType: 'audio/webm' };
-        const mediaRecorder = new MediaRecorder(stream, options);
+        //const options = { mimeType: 'audio/webm' };
+        recorder = new MediaRecorder(stream);
 
-        mediaRecorder.addEventListener('dataavailable', function (e) {
-            if (e.data.size > 0) recordedChunks.push(e.data);
-        });
+        recorder.ondataavailable = evt => recordedChunks.push(evt.data);
 
-        mediaRecorder.addEventListener('stop', function () {
-
-            /*const audioContext = new AudioContext();
-
-            audioIn_01 = audioContext.createMediaStreamSource(speaker);
-            audioIn_02 = audioContext.createMediaStreamSource(IncomingAudioMediaStream);
-
-            const dest = audioContext.createMediaStreamDestination();
-
-            audioIn_01.connect(dest);
-            audioIn_02.connect(dest);
-
-            var FinalStream = dest.stream;
-
-            console.log(FinalStream.getAudioTracks())*/
-            
-            const videoBuff = new Blob(recordedChunks);
-            const micBuff = new Blob(micRecordedChunks);
-
-            concatenateBlobs([videoBuff, micBuff], "audio/wav", function(blob) {
-                const audio = URL.createObjectURL(blob);
-                audioContainer.classList.remove("hidden");
-                downloadButton.href = audio
-                downloadButton.download = `Taskmarvel_recording_${Date.now().toString()}.wav`;
-                audioPlayer.src = audio;
-                stopButton.classList.add("hidden");
-                recordButton.classList.remove("hidden");
-                instructions.classList.remove("hidden");
-            });
+        recorder.addEventListener('stop', function () {
+            const audio = URL.createObjectURL(new Blob(recordedChunks));
+            audioContainer.classList.remove("hidden");
+            downloadButton.href = audio
+            downloadButton.download = `Taskmarvel_recording_${Date.now().toString()}.wav`;
+            audioPlayer.src = audio;
+            stopButton.classList.add("hidden");
+            recordButton.classList.remove("hidden");
+            instructions.classList.remove("hidden");
         });
 
         stopButton.addEventListener('click', function () {
             downloadButton.classList.remove("hidden");
-            micMediaRecorder.stop();
-            mediaRecorder.stop();
-            // TODO: Stop stream
+            stopMicRecord();
+            recorder.stop();
             stream.getVideoTracks().forEach(track => track.stop());
         });
 
-        mediaRecorder.start();
+        recorder.start();
     };
 
-    function recordMic() {
+    const mergeStream = () => {
+        var OutgoingAudioMediaStream = new MediaStream();
+        OutgoingAudioMediaStream.addTrack(speakerStream.getAudioTracks()[0]);
+
+        var IncomingAudioMediaStream = new MediaStream();
+        IncomingAudioMediaStream.addTrack(micStream.getAudioTracks()[0]);
+
+        const audioContext = new AudioContext();
+
+        audioIn_01 = audioContext.createMediaStreamSource(OutgoingAudioMediaStream);
+        audioIn_02 = audioContext.createMediaStreamSource(IncomingAudioMediaStream);
+
+        dest = audioContext.createMediaStreamDestination();
+
+        audioIn_01.connect(dest);
+        audioIn_02.connect(dest);
+
+        var finalStream = dest.stream;
+
+        handleSuccess(finalStream);
+    }
+
+    const recordMic = () => {
         navigator.mediaDevices.getUserMedia({ audio: true })
             .then(stream => {
-                micMediaRecorder = new MediaRecorder(stream);
-                micMediaRecorder.start();
-                IncomingAudioMediaStream.addTrack(stream.getAudioTracks()[0].clone());
-
-                micMediaRecorder.addEventListener("dataavailable", e => {
-                    micRecordedChunks.push(e.data);
-                });
+                micStream = new MediaRecorder(stream);
+                micStream.ondataavailable = evt => recordedChunks.push(evt.data);
+                micStream.start();
             });
     }
 
-    const handleTracks = function (speaker, stream) {
+    const stopMicRecord = () => micRecorder.stop();
+
+    const handleTracks = function (stream) {
         if (!stream.getAudioTracks().length){
             alert("Make sure to enable sharing system audio");
             recordButton.classList.remove("hidden");
             return;
-        } 
-        recordMic();
-        stopButton.classList.remove("hidden");
-        instructions.classList.add("hidden");
-        speaker.addTrack(stream.getAudioTracks()[0].clone());
-        // stopping and removing the video track to enhance the performance
-        stream.getVideoTracks()[0].stop();
-        stream.removeTrack(stream.getVideoTracks()[0]);
-        handleSuccess(stream);
+        }
+        //recordMic();
+        speakerStream = stream;
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(stream => {
+                micStream = stream;
+                micRecorder = new MediaRecorder(micStream);
+                micRecorder.ondataavailable = evt => recordedChunks.push(evt.data);
+                micRecorder.start();
+                stopButton.classList.remove("hidden");
+                instructions.classList.add("hidden");
+                //speakerStream.addTrack(stream.getAudioTracks()[0]);
+                // stopping and removing the video track to enhance the performance
+                speakerStream.getVideoTracks()[0].stop();
+                speakerStream.removeTrack(speakerStream.getVideoTracks()[0]);
+                //handleSuccess(stream);
+                mergeStream();
+            });
     }
 
     if (navigator.getDisplayMedia) {
@@ -102,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 sampleRate: 44100
             }
         })
-            .then(stream => handleTracks(speaker, stream))
+            .then(stream => handleTracks(stream))
             .catch((e) => {
                 console.error('Failed', e.message);
                 stopButton.classList.add("hidden");
@@ -117,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 sampleRate: 44100
             }
         })
-            .then(stream => handleTracks(speaker, stream))
+            .then(stream => handleTracks(stream))
             .catch((e) => {
                 console.error('Failed', e.message);
                 stopButton.classList.add("hidden");

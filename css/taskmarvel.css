@@ -22,7 +22,7 @@ body{
 }
 .tm--instructions {
     top: 0;
-    font-size: 2em;
+    font-size: 20px;
     left: 10px;
     position: absolute;
 }
