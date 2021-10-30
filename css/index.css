@@ -4,7 +4,7 @@ body {
     font-family: 'Montserrat', sans-serif;
     margin: 0px;
     padding: 0px;
-    height: 350px;
+    height: 250px;
     width: 350px;
 }
 
@@ -17,6 +17,10 @@ h4 {
 
 a {
     color: #E0113F;
+}
+
+.hidden {
+    display: none !important;
 }
 
 .tm--container {

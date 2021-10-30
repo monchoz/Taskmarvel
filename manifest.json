@@ -1,16 +1,16 @@
 {  
     "manifest_version": 2,  
-    "name": "Taskmarvel - Audio to text transcription empowered by AI",  
+    "name": "Taskmarvel - Audio to text empowered by AI",  
     "description": "Records audio from your video calls to deliver a full-text transcription.",  
     "version": "1.0", 
     "author": "Ramon Zuniga (ramonzuniga@gmail.com)",
     "icons": {
-        "128": "img/taskmarvel-logo-128.png",
-        "48": "img/taskmarvel-logo-48.png",
-        "16": "img/taskmarvel-logo-16.png"
+        "128": "img/taskmarvel-128.png",
+        "48": "img/taskmarvel-48.png",
+        "16": "img/taskmarvel-16.png"
     },
     "browser_action": {  
-        "default_icon": "img/taskmarvel-logo-16.png",  
+        "default_icon": "img/taskmarvel-16.png",  
         "default_popup": "index.html"  
     },  
     "permissions": ["activeTab", "tabs"]  
