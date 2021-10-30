@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', function () {
     recordButton.addEventListener('click', (() => window.location.reload()));
 
     const handleSuccess = function (stream) {
-        //const options = { mimeType: 'audio/webm' };
         recorder = new MediaRecorder(stream);
 
         recorder.ondataavailable = evt => recordedChunks.push(evt.data);
@@ -61,15 +60,6 @@ document.addEventListener('DOMContentLoaded', function () {
         handleSuccess(finalStream);
     }
 
-    const recordMic = () => {
-        navigator.mediaDevices.getUserMedia({ audio: true })
-            .then(stream => {
-                micStream = new MediaRecorder(stream);
-                micStream.ondataavailable = evt => recordedChunks.push(evt.data);
-                micStream.start();
-            });
-    }
-
     const stopMicRecord = () => micRecorder.stop();
 
     const handleTracks = function (stream) {
@@ -78,21 +68,17 @@ document.addEventListener('DOMContentLoaded', function () {
             recordButton.classList.remove("hidden");
             return;
         }
-        //recordMic();
         speakerStream = stream;
         navigator.mediaDevices.getUserMedia({ audio: true })
             .then(stream => {
                 micStream = stream;
                 micRecorder = new MediaRecorder(micStream);
-                micRecorder.ondataavailable = evt => recordedChunks.push(evt.data);
                 micRecorder.start();
                 stopButton.classList.remove("hidden");
                 instructions.classList.add("hidden");
-                //speakerStream.addTrack(stream.getAudioTracks()[0]);
                 // stopping and removing the video track to enhance the performance
                 speakerStream.getVideoTracks()[0].stop();
                 speakerStream.removeTrack(speakerStream.getVideoTracks()[0]);
-                //handleSuccess(stream);
                 mergeStream();
             });
     }
