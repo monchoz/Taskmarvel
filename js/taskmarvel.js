@@ -29,10 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         stopButton.addEventListener('click', function () {
-            downloadButton.classList.remove("hidden");
-            stopMicRecord();
-            recorder.stop();
-            stream.getVideoTracks().forEach(track => track.stop());
+            stopRecording();
         });
 
         recorder.start();
@@ -62,6 +59,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const stopMicRecord = () => micRecorder.stop();
 
+    const stopRecording = () => {
+        downloadButton.classList.remove("hidden");
+        stopMicRecord();
+        recorder.stop();
+    }
+
     const handleTracks = function (stream) {
         if (!stream.getAudioTracks().length){
             alert("Make sure to enable sharing system audio");
@@ -69,6 +72,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
         speakerStream = stream;
+        speakerStream.getVideoTracks()[0].addEventListener('ended', () => stopRecording())
         navigator.mediaDevices.getUserMedia({ audio: true })
             .then(stream => {
                 micStream = stream;
@@ -76,9 +80,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 micRecorder.start();
                 stopButton.classList.remove("hidden");
                 instructions.classList.add("hidden");
-                // stopping and removing the video track to enhance the performance
-                speakerStream.getVideoTracks()[0].stop();
-                speakerStream.removeTrack(speakerStream.getVideoTracks()[0]);
                 mergeStream();
             });
     }
@@ -89,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function () {
             audio: {
                 echoCancellation: true,
                 noiseSuppression: true,
-                sampleRate: 44100
+                sampleRate: 48000
             }
         })
             .then(stream => handleTracks(stream))
@@ -104,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function () {
             audio: {
                 echoCancellation: true,
                 noiseSuppression: true,
-                sampleRate: 44100
+                sampleRate: 48000
             }
         })
             .then(stream => handleTracks(stream))
