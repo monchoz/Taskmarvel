@@ -16,16 +16,12 @@ document.addEventListener('DOMContentLoaded', function () {
         let form = new FormData();
         form.append('file', blob, fileName);
         form.append('title', fileName);
-        $.ajax({
-            type: 'POST',
-            url: ' http://192.168.1.2:5000/api/upload',
-            data: form,
-            cache: false,
-            processData: false,
-            contentType: false
-        }).done(function(data) {
-            console.log(data);
-        });
+        fetch('http://192.168.1.2:5000/api/upload', {
+            method: 'POST',
+            body: form
+        })
+        .then(res => console.log(res))
+        .catch(err => console.error(err));
     }
 
     const handleSuccess = function (stream) {
