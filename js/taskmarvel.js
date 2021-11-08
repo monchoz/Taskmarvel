@@ -12,20 +12,40 @@ document.addEventListener('DOMContentLoaded', function () {
 
     recordButton.addEventListener('click', (() => window.location.reload()));
 
+    const fileUpload = (blob, fileName) => {
+        let form = new FormData();
+        form.append('file', blob, fileName);
+        form.append('title', fileName);
+        $.ajax({
+            type: 'POST',
+            url: ' http://192.168.1.2:5000/api/upload',
+            data: form,
+            cache: false,
+            processData: false,
+            contentType: false
+        }).done(function(data) {
+            console.log(data);
+        });
+    }
+
     const handleSuccess = function (stream) {
         recorder = new MediaRecorder(stream);
 
         recorder.ondataavailable = evt => recordedChunks.push(evt.data);
 
         recorder.addEventListener('stop', function () {
-            const audio = URL.createObjectURL(new Blob(recordedChunks));
+            const fileName = `Taskmarvel_recording_${Date.now().toString()}.wav`;
+            const audioBlob = new Blob(recordedChunks);
+            const audio = URL.createObjectURL(audioBlob);
             audioContainer.classList.remove("hidden");
             downloadButton.href = audio
-            downloadButton.download = `Taskmarvel_recording_${Date.now().toString()}.wav`;
+            downloadButton.download = fileName;
             audioPlayer.src = audio;
             stopButton.classList.add("hidden");
             recordButton.classList.remove("hidden");
             instructions.classList.remove("hidden");
+            // Upload audio file to retrieve transcription
+            fileUpload(audioBlob, fileName);
         });
 
         stopButton.addEventListener('click', function () {
