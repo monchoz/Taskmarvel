@@ -13,6 +13,6 @@
         "default_icon": "img/taskmarvel-16.png",  
         "default_popup": "index.html"  
     },  
-    "permissions": ["activeTab", "tabs", "http://192.168.1.2/"],
-    "host_permissions": ["http://192.168.1.2/"]
+    "permissions": ["activeTab", "tabs", "http://192.168.1.2/", "http://34.136.104.68/"],
+    "host_permissions": ["http://192.168.1.2/", "http://34.136.104.68/"]
 }

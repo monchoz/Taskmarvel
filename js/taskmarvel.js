@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
         loader.classList.remove("hidden");
         form.append('file', blob, fileName);
         form.append('title', fileName);
-        fetch('http://192.168.1.2:5000/api/upload', {
+        fetch('http://34.136.104.68:80/api/upload', {
             method: 'POST',
             body: form
         })
