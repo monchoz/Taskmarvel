@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 transcription.innerHTML = "No words found";
             } else {
                 data.results.forEach(word => {
-                    transcription.innerHTML += `${word.alternatives[0].transcript} `;
+                    transcription.innerHTML += `${word.alternatives[0].transcript} \n\n`;
                 });
             }
             loader.classList.add("hidden");
