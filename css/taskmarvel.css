@@ -5,6 +5,9 @@ body{
     height: 100%;
     width: 100%;
 }
+#transcription {
+    font-size: 2em;
+}
 .hidden {
     display: none !important;
 }
@@ -24,5 +27,4 @@ body{
     top: 0;
     font-size: 20px;
     left: 10px;
-    position: absolute;
 }

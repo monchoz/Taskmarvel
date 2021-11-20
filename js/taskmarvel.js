@@ -9,19 +9,36 @@ document.addEventListener('DOMContentLoaded', function () {
     const audioPlayer = document.getElementById("audio");
     const audioContainer = document.getElementById("audioContainer");
     const instructions = document.getElementById("instructions");
+    const transcription = document.getElementById("transcription");
+    const loader = document.getElementById("loader");
 
     recordButton.addEventListener('click', (() => window.location.reload()));
 
     const fileUpload = (blob, fileName) => {
         let form = new FormData();
+        loader.classList.remove("hidden");
         form.append('file', blob, fileName);
         form.append('title', fileName);
         fetch('http://192.168.1.2:5000/api/upload', {
             method: 'POST',
             body: form
         })
-        .then(res => console.log(res))
-        .catch(err => console.error(err));
+        .then(response => response.json())
+        .then(data => {
+            if (!data.results.length) {
+                transcription.innerHTML = "No words found";
+            } else {
+                data.results.forEach(word => {
+                    transcription.innerHTML += `${word.alternatives[0].transcript} `;
+                });
+            }
+            loader.classList.add("hidden");
+        })
+        .catch(err => {
+            console.error(err);
+            loader.classList.add("hidden");
+            alert("Unable to transcribe");
+        });
     }
 
     const handleSuccess = function (stream) {
@@ -39,7 +56,6 @@ document.addEventListener('DOMContentLoaded', function () {
             audioPlayer.src = audio;
             stopButton.classList.add("hidden");
             recordButton.classList.remove("hidden");
-            instructions.classList.remove("hidden");
             // Upload audio file to retrieve transcription
             fileUpload(audioBlob, fileName);
         });
