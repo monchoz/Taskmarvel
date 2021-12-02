@@ -19,7 +19,8 @@ document.addEventListener('DOMContentLoaded', function () {
         loader.classList.remove("hidden");
         form.append('file', blob, fileName);
         form.append('title', fileName);
-        fetch('http://35.209.90.43:80/api/upload', {
+        //fetch('http://35.209.90.43:80/api/upload', {
+        fetch('http://localhost:5000/api/upload', {
             method: 'POST',
             body: form
         })
@@ -28,7 +29,9 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!data.results.length) {
                 transcription.innerHTML = "No words found";
             } else {
-                data.results.forEach(word => {
+                // filter words when channel = 1
+                const words = data.results.filter(word => word.channel_tag === 1);
+                words.forEach(word => {
                     transcription.innerHTML += `${word.alternatives[0].transcript} \n\n`;
                 });
             }

@@ -23,6 +23,7 @@ body{
 .tm--controls {
     display: flex;
     flex-direction: column;
+    padding: 0 20px;
     width: 300px;
 }
 .tm--instructions {
